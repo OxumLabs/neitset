@@ -1,0 +1,14 @@
+F:\cs\neitset\bin\Release\net8.0\neitset.exe
+F:\cs\neitset\bin\Release\net8.0\neitset.deps.json
+F:\cs\neitset\bin\Release\net8.0\neitset.runtimeconfig.json
+F:\cs\neitset\bin\Release\net8.0\neitset.dll
+F:\cs\neitset\bin\Release\net8.0\neitset.pdb
+F:\cs\neitset\obj\Release\net8.0\neitset.GeneratedMSBuildEditorConfig.editorconfig
+F:\cs\neitset\obj\Release\net8.0\neitset.AssemblyInfoInputs.cache
+F:\cs\neitset\obj\Release\net8.0\neitset.AssemblyInfo.cs
+F:\cs\neitset\obj\Release\net8.0\neitset.csproj.CoreCompileInputs.cache
+F:\cs\neitset\obj\Release\net8.0\neitset.dll
+F:\cs\neitset\obj\Release\net8.0\refint\neitset.dll
+F:\cs\neitset\obj\Release\net8.0\neitset.pdb
+F:\cs\neitset\obj\Release\net8.0\neitset.genruntimeconfig.cache
+F:\cs\neitset\obj\Release\net8.0\ref\neitset.dll

@@ -1,0 +1,5 @@
+F:\cs\neitset\bin\Release\net8.0\publish\neitset.exe
+F:\cs\neitset\bin\Release\net8.0\publish\neitset.dll
+F:\cs\neitset\bin\Release\net8.0\publish\neitset.deps.json
+F:\cs\neitset\bin\Release\net8.0\publish\neitset.runtimeconfig.json
+F:\cs\neitset\bin\Release\net8.0\publish\neitset.pdb

@@ -1,0 +1,2 @@
+F:\cs\neitset\bin\Release\net8.0\win-x64\publish\neitset.pdb
+F:\cs\neitset\bin\Release\net8.0\win-x64\publish\neitset.exe

@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType> <!-- Make sure it's set to an executable -->
+    <TargetFramework>net8.0</TargetFramework> <!-- Target appropriate framework -->
+    <PublishSingleFile>true</PublishSingleFile> <!-- Publish as a single file -->
+    <SelfContained>true</SelfContained> <!-- Include .NET runtime -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier> <!-- Specify target platform -->
+    <PublishTrimmed>true</PublishTrimmed> <!-- Trim unused assemblies -->
+    <TrimMode>link</TrimMode> <!-- Use 'link' trimming mode for optimized size -->
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract> <!-- For improved compatibility -->
+  </PropertyGroup>
+</Project>
