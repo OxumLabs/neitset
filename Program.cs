@@ -101,7 +101,7 @@ namespace NeitInstaller
                 string neitInstallPath = "/usr/local/bin/Neit";
                 if (await ConfirmAction("Do you want to download and install Neit? (y/n)"))
                 {
-                    string neitZipUrl = "https://github.com/OxumLabs/neit/releases/download/0.0.34/neit_linux.zip";
+                    string neitZipUrl = "https://github.com/OxumLabs/neit/releases/download/0.0.34/neit_lin.zip";
                     await DownloadAndExtractNeit(neitZipUrl, neitInstallPath);
                 }
 
