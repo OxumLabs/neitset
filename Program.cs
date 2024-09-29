@@ -60,7 +60,7 @@ namespace NeitInstaller
                 if (await ConfirmAction("Do you want to download and install Neit? (y/n)"))
                 {
                     string neitZipUrl = "https://github.com/OxumLabs/neit/releases/download/0.0.34/neit_win.zip";
-                    await DownloadAndExtractNeit(neitZipUrl, neitInstallPath);
+                    await DownloadAndExtractNeitWindows(neitZipUrl, neitInstallPath);
                 }
 
                 // Step 3: Install Visual C++ Redistributable
@@ -89,6 +89,14 @@ namespace NeitInstaller
         // Handles installation for Linux
         static async Task HandleLinuxInstallation()
         {
+            if (!IsSudo())
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Error: This installer must be run with sudo privileges.");
+                Console.ResetColor();
+                return;
+            }
+
             try
             {
                 // Step 1: Install LLVM for Linux
@@ -97,12 +105,12 @@ namespace NeitInstaller
                     await InstallLLVMLinux();
                 }
 
-                // Step 2: Download and install Neit
-                string neitInstallPath = "/usr/local/bin/Neit";
+                // Step 2: Download and install Neit using wget
+                string neitInstallPath = "/usr/local/bin/Neit/linux";
                 if (await ConfirmAction("Do you want to download and install Neit? (y/n)"))
                 {
                     string neitZipUrl = "https://github.com/OxumLabs/neit/releases/download/0.0.34/neit_lin.zip";
-                    await DownloadAndExtractNeit(neitZipUrl, neitInstallPath);
+                    await DownloadAndExtractNeitLinux(neitZipUrl, neitInstallPath);
                 }
 
                 // Step 3: Add Neit to system PATH
@@ -122,7 +130,23 @@ namespace NeitInstaller
             }
         }
 
-        // Try installing LLVM using different package managers for Linux
+        // Confirm action with the user
+        static async Task<bool> ConfirmAction(string message)
+        {
+            Console.Write($"{message} ");
+            string response = Console.ReadLine().Trim().ToLower();
+            return response == "y" || response == "yes";
+        }
+
+        // ===================== Linux-Specific Functions =====================
+
+        // Check if running with sudo privileges (Linux)
+        static bool IsSudo()
+        {
+            return Environment.UserName == "root";
+        }
+
+        // Install LLVM for Linux
         static async Task InstallLLVMLinux()
         {
             string[] packageManagers = {
@@ -155,7 +179,129 @@ namespace NeitInstaller
             throw new Exception("Failed to install LLVM using available package managers.");
         }
 
-        // Run shell command for Linux
+        // Download and extract Neit using wget (Linux)
+        static async Task DownloadAndExtractNeitLinux(string url, string destinationFolder)
+        {
+            string neitZipPath = Path.Combine(Path.GetTempPath(), "neit.zip");
+
+            Console.WriteLine($"Downloading Neit using wget ({url})...");
+            string wgetCommand = $"wget -O {neitZipPath} {url}";
+
+            RunShellCommand(wgetCommand);
+            Console.WriteLine("\nDownload completed.");
+
+            Console.WriteLine("Extracting Neit...");
+            if (!Directory.Exists(destinationFolder))
+            {
+                Directory.CreateDirectory(destinationFolder);
+            }
+            ZipFile.ExtractToDirectory(neitZipPath, destinationFolder);
+            Console.WriteLine("Neit extracted successfully.");
+        }
+
+        // Add Neit to environment PATH for Linux
+        static void AddToEnvironmentPathLinux(string path)
+        {
+            string bashProfilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".bashrc");
+            if (!File.ReadAllText(bashProfilePath).Contains(path))
+            {
+                File.AppendAllText(bashProfilePath, $"\nexport PATH=\"$PATH:{path}\"");
+                Console.WriteLine("Updated system PATH to include Neit.");
+            }
+            else
+            {
+                Console.WriteLine("Neit path is already included in the system PATH.");
+            }
+        }
+
+        // ===================== Windows-Specific Functions =====================
+
+        // Check if running as administrator (Windows)
+        static bool IsRunAsAdministrator()
+        {
+            var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
+            var principal = new System.Security.Principal.WindowsPrincipal(identity);
+            return principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+        }
+
+        // Download and extract Neit for Windows
+        static async Task DownloadAndExtractNeitWindows(string url, string destinationFolder)
+        {
+            string neitZipPath = Path.Combine(Path.GetTempPath(), "neit_win.zip");
+            long fileSize = await GetFileSize(url);
+
+            Console.WriteLine($"Downloading Neit ({FormatBytes(fileSize)})...");
+            using (WebClient webClient = new WebClient())
+            {
+                webClient.DownloadProgressChanged += (s, e) =>
+                {
+                    Console.Write($"\rDownload progress: {e.ProgressPercentage}%");
+                };
+
+                await webClient.DownloadFileTaskAsync(url, neitZipPath);
+            }
+            Console.WriteLine("\nDownload completed.");
+
+            Console.WriteLine("Extracting Neit...");
+            if (!Directory.Exists(destinationFolder))
+            {
+                Directory.CreateDirectory(destinationFolder);
+            }
+            ZipFile.ExtractToDirectory(neitZipPath, destinationFolder);
+            Console.WriteLine("Neit extracted successfully.");
+        }
+
+        // Add Neit to environment PATH for Windows
+        static void AddToEnvironmentPathWindows(string path)
+        {
+            string currentPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+            if (!currentPath.Contains(path))
+            {
+                string newPath = $"{currentPath};{path}";
+                Environment.SetEnvironmentVariable("PATH", newPath, EnvironmentVariableTarget.Machine);
+                Console.WriteLine("Updated system PATH to include Neit.");
+            }
+            else
+            {
+                Console.WriteLine("Neit path is already included in the system PATH.");
+            }
+        }
+
+        // Download and install LLVM for Windows
+        static async Task InstallLLVMWindows(string url)
+        {
+            string llvmInstallerPath = Path.Combine(Path.GetTempPath(), "LLVMInstaller.exe");
+            Console.WriteLine("Downloading LLVM...");
+            using (WebClient webClient = new WebClient())
+            {
+                await webClient.DownloadFileTaskAsync(url, llvmInstallerPath);
+            }
+
+            Console.WriteLine("Installing LLVM...");
+            Process.Start(llvmInstallerPath)?.WaitForExit();
+            Console.WriteLine("LLVM installed successfully.");
+        }
+
+        // Install Visual C++ Redistributable for Windows
+        static async Task InstallVCRedist()
+        {
+            string url = "https://aka.ms/vs/17/release/vc_redist.x64.exe";
+            string installerPath = Path.Combine(Path.GetTempPath(), "vcredist.exe");
+
+            Console.WriteLine("Downloading Visual C++ Redistributable...");
+            using (WebClient webClient = new WebClient())
+            {
+                await webClient.DownloadFileTaskAsync(url, installerPath);
+            }
+
+            Console.WriteLine("Installing Visual C++ Redistributable...");
+            Process.Start(installerPath, "/install /quiet /norestart")?.WaitForExit();
+            Console.WriteLine("Visual C++ Redistributable installed successfully.");
+        }
+
+        // ===================== Helper Functions =====================
+
+        // Run a shell command (for Linux)
         static void RunShellCommand(string command)
         {
             Process process = new Process
@@ -180,130 +326,7 @@ namespace NeitInstaller
             }
         }
 
-        // Add Neit to environment PATH for Linux
-        static void AddToEnvironmentPathLinux(string path)
-        {
-            string bashProfilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".bashrc");
-            if (!File.ReadAllText(bashProfilePath).Contains(path))
-            {
-                File.AppendAllText(bashProfilePath, $"\nexport PATH=\"$PATH:{path}\"");
-                Console.WriteLine("Updated system PATH to include Neit.");
-            }
-            else
-            {
-                Console.WriteLine("Neit path is already included in the system PATH.");
-            }
-        }
-
-        // Add Neit to environment PATH for Windows
-        static void AddToEnvironmentPathWindows(string path)
-        {
-            string currentPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
-            if (!currentPath.Contains(path))
-            {
-                string newPath = $"{currentPath};{path}";
-                Environment.SetEnvironmentVariable("PATH", newPath, EnvironmentVariableTarget.Machine);
-                Console.WriteLine("Updated system PATH to include Neit.");
-            }
-            else
-            {
-                Console.WriteLine("Neit path is already included in the system PATH.");
-            }
-        }
-
-        // Confirm action with the user
-        static async Task<bool> ConfirmAction(string message)
-        {
-            Console.Write($"{message} ");
-            string response = Console.ReadLine().Trim().ToLower();
-            return response == "y" || response == "yes";
-        }
-
-        // Download and extract Neit (common for Windows and Linux)
-        static async Task DownloadAndExtractNeit(string url, string destinationFolder)
-        {
-            string neitZipPath = Path.Combine(Path.GetTempPath(), "neit.zip");
-            long fileSize = await GetFileSize(url);
-
-            Console.WriteLine($"Downloading Neit ({FormatBytes(fileSize)})...");
-            using (WebClient webClient = new WebClient())
-            {
-                webClient.DownloadProgressChanged += (s, e) =>
-                {
-                    Console.Write($"\rDownload progress: {e.ProgressPercentage}%");
-                };
-
-                await webClient.DownloadFileTaskAsync(url, neitZipPath);
-            }
-            Console.WriteLine("\nDownload completed.");
-
-            Console.WriteLine("Extracting Neit...");
-            if (!Directory.Exists(destinationFolder))
-            {
-                Directory.CreateDirectory(destinationFolder);
-            }
-            ZipFile.ExtractToDirectory(neitZipPath, destinationFolder);
-            Console.WriteLine("Neit extracted successfully.");
-        }
-
-        // Check if running as administrator (Windows)
-        static bool IsRunAsAdministrator()
-        {
-            var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
-            var principal = new System.Security.Principal.WindowsPrincipal(identity);
-            return principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
-        }
-
-        // Download and install LLVM for Windows
-        static async Task InstallLLVMWindows(string url)
-        {
-            string llvmInstallerPath = Path.Combine(Path.GetTempPath(), "llvm_installer.exe");
-            long fileSize = await GetFileSize(url);
-
-            Console.WriteLine($"Downloading LLVM ({FormatBytes(fileSize)})...");
-            using (WebClient webClient = new WebClient())
-            {
-                webClient.DownloadProgressChanged += (s, e) =>
-                {
-                    Console.Write($"\rDownload progress: {e.ProgressPercentage}%");
-                };
-
-                await webClient.DownloadFileTaskAsync(url, llvmInstallerPath);
-            }
-            Console.WriteLine("\nDownload completed.");
-
-            Console.WriteLine("Installing LLVM...");
-            var llvmProcess = Process.Start(llvmInstallerPath, "/passive");
-            llvmProcess.WaitForExit();
-            Console.WriteLine("LLVM installation completed.");
-        }
-
-        // Download and install Visual C++ Redistributable for Windows
-        static async Task InstallVCRedist()
-        {
-            string url = "https://aka.ms/vs/17/release/vc_redist.x64.exe";
-            string vcRedistInstallerPath = Path.Combine(Path.GetTempPath(), "vc_redist_installer.exe");
-            long fileSize = await GetFileSize(url);
-
-            Console.WriteLine($"Downloading Visual C++ Redistributable ({FormatBytes(fileSize)})...");
-            using (WebClient webClient = new WebClient())
-            {
-                webClient.DownloadProgressChanged += (s, e) =>
-                {
-                    Console.Write($"\rDownload progress: {e.ProgressPercentage}%");
-                };
-
-                await webClient.DownloadFileTaskAsync(url, vcRedistInstallerPath);
-            }
-            Console.WriteLine("\nDownload completed.");
-
-            Console.WriteLine("Installing Visual C++ Redistributable...");
-            var vcProcess = Process.Start(vcRedistInstallerPath, "/passive");
-            vcProcess.WaitForExit();
-            Console.WriteLine("Visual C++ Redistributable installation completed.");
-        }
-
-        // Helper: Get file size of a remote file
+        // Get file size (for download progress)
         static async Task<long> GetFileSize(string url)
         {
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
@@ -314,7 +337,7 @@ namespace NeitInstaller
             }
         }
 
-        // Helper: Format bytes to human-readable size
+        // Format bytes to human-readable size
         static string FormatBytes(long bytes)
         {
             string[] sizes = { "B", "KB", "MB", "GB", "TB" };
@@ -322,7 +345,7 @@ namespace NeitInstaller
             while (bytes >= 1024 && order < sizes.Length - 1)
             {
                 order++;
-                bytes = bytes / 1024;
+                bytes /= 1024;
             }
             return $"{bytes:0.##} {sizes[order]}";
         }

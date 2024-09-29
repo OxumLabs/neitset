@@ -195,3 +195,4 @@ F:\cs\neitset\obj\Release\net8.0\linux-x64\refint\neitset.dll
 F:\cs\neitset\obj\Release\net8.0\linux-x64\neitset.pdb
 F:\cs\neitset\obj\Release\net8.0\linux-x64\neitset.genruntimeconfig.cache
 F:\cs\neitset\obj\Release\net8.0\linux-x64\ref\neitset.dll
+F:\cs\neitset\obj\Release\net8.0\linux-x64\neitset.sourcelink.json

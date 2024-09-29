@@ -195,3 +195,4 @@ F:\cs\neitset\bin\Release\net8.0\win-x64\mscorrc.dll
 F:\cs\neitset\bin\Release\net8.0\win-x64\msquic.dll
 F:\cs\neitset\obj\Release\net8.0\win-x64\neitset.csproj.Up2Date
 F:\cs\neitset\obj\Release\net8.0\win-x64\neitset.genruntimeconfig.cache
+F:\cs\neitset\obj\Release\net8.0\win-x64\neitset.sourcelink.json
