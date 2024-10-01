@@ -9,7 +9,7 @@
         }
       }
     },
-    "net8.0/linux-x64": {
+    "net8.0/win-x64": {
       "Microsoft.NET.ILLink.Tasks/8.0.8": {
         "type": "package",
         "build": {
@@ -138,15 +138,15 @@
         "warn": true,
         "downloadDependencies": [
           {
-            "name": "Microsoft.AspNetCore.App.Runtime.linux-x64",
+            "name": "Microsoft.AspNetCore.App.Runtime.win-x64",
             "version": "[8.0.8, 8.0.8]"
           },
           {
-            "name": "Microsoft.NETCore.App.Host.linux-x64",
+            "name": "Microsoft.NETCore.App.Runtime.win-x64",
             "version": "[8.0.8, 8.0.8]"
           },
           {
-            "name": "Microsoft.NETCore.App.Runtime.linux-x64",
+            "name": "Microsoft.WindowsDesktop.App.Runtime.win-x64",
             "version": "[8.0.8, 8.0.8]"
           }
         ],
@@ -159,7 +159,7 @@
       }
     },
     "runtimes": {
-      "linux-x64": {
+      "win-x64": {
         "#import": []
       }
     }
