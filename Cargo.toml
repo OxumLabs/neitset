@@ -1,0 +1,14 @@
+[package]
+name = "neitset"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+colored = "2.1.0"
+flate2 = "1.0.34"
+indicatif = "0.17.8"
+reqwest = {version = "0.12.8" , features = ["blocking", "stream"]} 
+tar = "0.4.42"
+walkdir = "2.5.0"
+which = "6.0.3"
+zip = "2.2.0"
